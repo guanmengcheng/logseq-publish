@@ -1,0 +1,5 @@
+- intention-to-treat (ITT)
+- 意向性治疗（ITT）是指参与随机分组的对象，[[#red]]==无论其是否接收该组的治疗==，最终都纳入所分配的组中进行处理效应的统计分析。
+- [(22条消息) 因果推理(causal inference)中的ATT和ATE有什么区别？_3irius的博客-CSDN博客](https://blog.csdn.net/weixin_43478877/article/details/114106093)
+-
+-

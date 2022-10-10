@@ -1,0 +1,2 @@
+- average treatment effect for the treated group
+-

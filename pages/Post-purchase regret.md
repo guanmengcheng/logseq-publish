@@ -1,0 +1,25 @@
+- [[Info]]
+	- 题目：The Mere Co-participant Effect in Group Buying: 
+	  How Response Speed of the Co-participant Affects Consumer Post-Purchase Regret?
+	- 作者/合作人： [[管梦城]]， [[张意成]]， [[李建斌]]， [[Yi Liu]]
+	- 启动时间： [[2021-04-01]]
+	- 发表时间：
+	  id:: 62733b0c-1c9c-4ed8-aa37-283dfc3962ba
+	- 目标期刊：[[Decision Support System]]
+	- [[投稿记录]] ：[[PACIS2022]]
+	- 审稿意见：[[PACIS2022]]
+-
+- [[Post-purchase regret推进情况]]
+-
+- # 文章结构
+	- 团购模式介绍
+	- 团购的分类
+	- consumer-initiated可能造成冲动购买，导致post-purchase regret
+	- 之前关于post-purchase regret的研究，主要集中在xx方面
+	- 根据期望失调理论（EDT）引出研究问题
+-
+- # Literature Review
+	- [[LR in group buying]]
+	- [[Observational Learning]]
+	- [[others review]]
+	-

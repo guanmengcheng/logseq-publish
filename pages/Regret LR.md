@@ -1,0 +1,16 @@
+- Consumer post-purchase regret include emotions, refunds and product returns.
+	- Emotions
+		- Sameeni M S, Ahmad W, Filieri R, Brand Betrayal, Post-Purchase Regret, and Consumer Responses to Hedonic versus Utilitarian Products: The Moderating Role of Betrayal Discovery Mode[J]. Journal of Business Research, 2022, 141: 137–150.
+			- > The negative consequences of regret are conceptualized by two approaches, the valence-based and the emotion-based(Zeelenberg & Pieters, 2004)
+		- Zeelenberg M, Pieters R, Beyond Valence in Customer Dissatisfaction: A Review and New Findings on Behavioral Responses to Regret and Disappointment in Failed Services[J]. Journal of Business Research, 2004, 57(4): 445–455.
+			- > Dissatisfaction and the specific emotions disappointment and regret were assessed and their influence on customers’ behavioral responses (complaining, switching, word-of-mouth, and customer inertia)
+			-
+	- Refunds
+		- Dutta S, Biswas A, Grewal D, Regret from Postpurchase Discovery of Lower Market Prices: Do Price Refunds Help?[J]. Journal of Marketing, 2011, 75(6): 124–138.
+			- > Promising to refund money to customers who may find lower prices for the same or similar products is a widespread retailing phenomenon
+	- Product Returns
+		- Chang C-C, Tseng A-H, The Post-Purchase Communication Strategies for Supporting Online Impulse Buying[J]. Computers in Human Behavior, 2014, 39: 393–403.
+			- > For example, according to prior research (Inman, Dyer, & Jia, 1997; Tsiros & Mittal, 2000), consumer regret negatively influenced their post-purchase attitudes and behaviors. e-Tailer can pay specially attention to those consumers who often return their purchased products, since these consumers always regret their online purchase.
+		- M’Barek M B, Gharbi A, How Does Regret Influence Consumer’s Behavior?[J]. Journal of Organizational Management Studies, 2012, 2012: 1.
+			- > It was shown that regret has an influence on the post purchase evaluation via its impact on satisfaction and has various behavioral consequences such as: complaint, repurchasing behavior, Word of mouth communication, return, inertia etc...
+			-

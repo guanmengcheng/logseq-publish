@@ -1,0 +1,4 @@
+- file-path:: ../assets/Wang_Yu_2017_Social_interaction-based_consumer_decision-making_model_in_social_commerce_1651467396127_0.pdf
+  file:: [Wang_Yu_2017_Social_interaction-based_consumer_decision-making_model_in_social_commerce_1651467396127_0.pdf](../assets/Wang_Yu_2017_Social_interaction-based_consumer_decision-making_model_in_social_commerce_1651467396127_0.pdf)
+  title:: hls__Wang_Yu_2017_Social_interaction-based_consumer_decision-making_model_in_social_commerce_1651467396127_0
+-

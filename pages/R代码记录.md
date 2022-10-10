@@ -1,0 +1,864 @@
+---
+title: R代码记录
+date: 2021年1月14日11:05:34
+update: 2021年3月11日21:08:23
+tags: R
+categories: R
+toc: true
+sticky: 99
+---
+
+参考博客：[知乎文章]([R语言新书]2.7 数据处理神器：data.table包 - 张敬信的文章 - 知乎 https://zhuanlan.zhihu.com/p/343113981)、[知乎文章2](https://zhuanlan.zhihu.com/p/346366577)、[50题搞定data.table](https://zhuanlan.zhihu.com/p/257112435)
+
+## 1.修改Rstudio报错信息显示为英文
+
+```R
+Sys.setenv(LANGUAGE = "en"）
+```
+
+这个设置是临时的，如果需要永久修改，需要修改文件。
+## 2. 清除变量
+
+```R
+rm(object) # 清除单个变量
+rm(list = ls()) # 清除所有变量
+gc() # 垃圾回收，清除内存占用
+```
+## 3. data.table包
+
+速查表
+
+![preview](https://pic3.zhimg.com/v2-7d0d7f307b08d6298ff18fa46b294b12_r.jpg)
+
+![preview](https://pic2.zhimg.com/v2-fb7c43dafdea5ef118d0d5bb992cb741_r.jpg)
+
+data.table 包是 data.frame 的高性能版本，不依赖其它包就能胜任各种数据操作，速度超快，让个人电脑都能轻松处理几 G 甚至几十 G 的数据。data.table 的高性能来源于内存管理（引用语法）、并行化和大量精细优化。
+
+但是，与 tidyverse **一次用一个函数做一件事，通过管道依次连接整洁地完成复杂事情** 的理念截然不同，data.table 语法高度抽象、简洁、一致：
+
+![](https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/20210224160658.png)
+
+一句话概括：**用 i 选择行，用 j 操作列，根据 by 分组**。
+#### 3.1 **特殊符号**
+
+data.table 提供了一些辅助操作的特殊符号：
+- `.()`: 代替 `list()`
+- `:=`: 按引用方式增加、修改列
+- `.N`: 行数
+- `.SD`: 每个分组的数据子集，除了 `by` 或 `keyby` 的列
+- `.SDcols`: 与 `.SD` 连用，用来选择包含在`.SD` 中的列
+- `.BY`: 包含所有 `by` 分组变量的 list
+- `.I`: 整数向量 `seq_len(nrow(x))`，例如 `DT[, .I[which.max(somecol)], by=grp]`
+- `.GRP`: 分组索引，1 代表第 1 分组，2 代表第 2 分组，. . .
+- `.NGRP`: 分组数
+- `.EACHI`: 用于 `by/keyby = .EACHI` 表示根据 `i` 表达式的每一行分组
+#### 3.2 数据读写
+
+函数 `fread()` 和 `fwrite()` 是data.table 最强大的函数之二。它们最大的优势，仍是读取大数据时速度超快（100 倍），且非常稳健，分隔符、列类型、行数都是自动检测；它们非常通用，可以处理不同的文件格式（但不能直接读取 Excel 文件），还可以接受 URLs 甚至是操作系统指令。
+
+**读入数据**
+
+```R
+fread("DT.csv")
+fread("DT.txt", sep = "\t")
+# 选择部分行列读取
+fread("DT.csv", select = c("V1", "V4"))
+fread("DT.csv", drop = "V4", nrows = 100)
+# 读取压缩文件
+fread(cmd = "unzip -cq myfile.zip")
+fread("myfile.gz")
+# 批量读取
+c("DT.csv", "DT.csv") %>%
+lapply(fread) %>%
+rbindlist()                                            # 多个数据框/列表按行合并
+```
+
+**写出数据**
+
+```R
+fwrite(DT, "DT.csv")
+fwrite(DT, "DT.csv", append = TRUE)                      # 追加内容
+fwrite(DT, "DT.txt", sep = "\t")
+fwrite(setDT(list(0, list(1:5))), "DT2.csv")             # 支持写出列表列
+fwrite(DT, "myfile.csv.gz", compress = "gzip")           # 写出到压缩文件
+```
+#### 3.3 数据连接
+
+data.table 提供了简单的按行合并函数：
+- `rbind(DT1, DT2, ...)`: 按行堆叠多个`data.table`
+- `rbindlist(DT_list, idcol)`: 堆叠多个`data.table `构成的 list
+  
+  最常用的六种数据连接：左连接、右连接、内连接、全连接、半连接、反连接，前四种连接又称为修改连接，后两种连接又称为过滤连接。
+  
+  **左连接**
+  
+  外连接至少保留一个数据表中的所有观测，分为左连接、右连接、全连接，其中最常用的是左连接：保留 `x` 所有行，合并匹配的 `y` 中的列。
+  
+  ```R
+  y[x, on = "v1"]                                    # 注意是以x 为左表
+  y[x]                                               # 若v1 是键
+  merge(x, y, all.x = TRUE, by = "v1")
+  ```
+  
+  ![img](https://pic4.zhimg.com/v2-99d291ea8cf59efc974d49e93ce2957b_b.png)
+  
+  上面代码提供了左连接的三种不同实现，为了易记性和可读性, 更建议用第三种 `merge()` 函数。
+  
+  ![img](https://pic1.zhimg.com/v2-8381e57ff72190e4c86b5dd4e6b6fd60_b.png)
+  
+  **右连接**
+  
+  保留 `y` 所有行，合并匹配的 `x` 中的列：
+  
+  ```R
+  merge(x, y, all.y = TRUE, by = "v1")
+  ```
+  
+  **内连接**
+  
+  内连接是保留两个数据表中所共有的观测：只保留 `x` 中与 `y` 匹配的行，合并匹配的 `y` 中的列：
+  
+  ```R
+  merge(x, y, by = "v1")
+  ```
+  
+  **全连接**
+  
+  保留 `x` 和 `y` 中的所有行，合并匹配的列：
+  
+  ```R
+  merge(x, y, all = TRUE, by = "v1")
+  ```
+  
+  **半连接**
+  
+  根据在 `y` 中，来筛选 `x` 中的行：
+  
+  ```R
+  x[y$v1, on = "v1", nomatch = 0]
+  ```
+  
+  **反连接**
+  
+  根据不在 `y` 中，来筛选 `x` 中的行：
+  
+  ```R
+  x[!y, on = "v1"]
+  ```
+  
+  **集合运算**
+  
+  ```R
+  fintersect(x, y)
+  fsetdiff(x, y)
+  funion(x, y)
+  fsetequal(x, y)
+  ```
+#### 3.4 数据操作
+
+**选择行**
+
+用 `i` 表达式，选择行。
+
+根据索引
+
+```R
+dt[3:4,]                  # 或 dt[3:4]
+dt[!3:7,]                 # 反选, 或 dt[-(3:7)]
+```
+
+根据逻辑表达式
+
+```R
+dt[v2 > 5]
+dt[v4 %chin% c("A","C")]          # 比 %in% 更快
+dt[v1==1 & v4=="A"]
+```
+
+删除重复行
+
+```R
+unique(dt)
+unique(dt, by = c("v1","v4"))    # 返回所有列
+```
+
+删除包含 NA 的行
+
+```R
+na.omit(dt, cols = 1:4)
+```
+
+行切片
+
+```R
+dt[sample(.N, 3)]                                 # 随机抽取3 行
+dt[sample(.N, .N * 0.5)]                          # 随机抽取50% 的行
+dt[frankv(-v1, ties.method = "dense") < 2]        # v1 值最大的行
+```
+
+其它
+
+```R
+dt[v4 %like% "^B"]                                 # v4 值以B 开头
+dt[v2 %between% c(3,5)]                            # 闭区间
+dt[between(v2, 3, 5, incbounds = FALSE)]           # 开区间
+dt[v2 %inrange% list(-1:1, 1:3)]                   # v2 值属于多个区间的某个
+dt[inrange(v2, -1:1, 1:3, incbounds = TRUE)]       # 同上
+```
+
+排序行
+
+```R
+dt[order(v1)]                                      # 默认按v1 从小到大
+dt[order(-v1)]                                     # 按v1 从大到小
+dt[order(v1, -v2)]                                 # 按v1 从小到大, v2 从大到小
+```
+
+若按引用对行重排序：
+
+```R
+setorder(DT, V1, -V2)
+```
+
+![img](https://pic1.zhimg.com/v2-b38671d2d173a3ad8d32bab318243b98_b.png)
+
+**操作列**
+
+用 `j` 表达式操作列。
+
+选择一列或多列
+
+```R
+# 根据索引
+dt[[3]]                                 # 或dt[["v3"]], dt$v3, 返回向量
+dt[, 3]                                 # 或dt[, "v3"], 返回data.table
+# 根据列名
+dt[, .(v3)]                             # 或dt[, list(v3)]
+dt[, .(v2,v3,v4)]
+dt[, v2:v4]
+dt[, !c("v2","v3")]                    # 反选列
+```
+
+反引用列名
+
+tidyverse 提供了丰富的选择列的辅助函数，而 data.table 需要字符串函数、正则表达式构造出列名向量，再通过反引用选择相应的列。
+
+```R
+cols = c("v2", "v3")
+dt[, ..cols]
+dt[, !..cols]
+cols = paste0("v", 1:3)                  # v1, v2, ...
+cols = union("v4", names(dt))            # v4 列提到第1 列
+cols = grep("v", names(dt))              # 列名中包含"v"
+cols = grep("^(a)", names(dt))           # 列名以"a" 开头
+cols = grep("b$", names(dt))             # 列名以"b" 结尾
+cols = grep(".2", names(dt))             # 正则匹配".2" 的列
+cols = grep("v1|X", names(dt))           # v1 或x
+dt[, ..cols]
+```
+
+调整列序
+
+```R
+cols = rev(names(DT))                    # 或其它列序
+setcolorder(DT, cols)
+```
+
+修改列名
+
+```R
+setnames(DT, old, new)
+```
+
+修改因子水平
+
+```R
+DT[, setattr(sex, "levels", c("M", "F"))]
+```
+
+tidyverse 是用 `mutate()` 修改列，不修改原数据框，必须赋值结果；data.table 修改列，是用列赋值符号 `:=` （不执行复制），直接对原数据框修改。
+
+修改或增加一列
+
+```R
+dt[, v1 := v1 ^ 2][]                       # 修改列, 加[] 输出结果
+dt[, v2 := log(v1)]                        # 增加新列
+dt[, .(v2 = log(v1), v3 = v2 + 1)]         # 只保留新列
+```
+
+![img](https://pic4.zhimg.com/v2-c6de559dfb7367e7474ca0baa9c892c7_b.jpg)
+
+增加多列
+
+```R
+dt[, c("v6","v7") := .(sqrt(v1), "x")]         # 或者
+dt[, ':='(v6 = sqrt(v1),
+v7 = "x")]                                     # v7 列的值全为x
+```
+
+同时修改多列
+
+tidyverse 是借助 `across()` 或 `_all, _if, _at` 后缀选择并同时操作多列；而 data.table 选择并操作多列是借助 `lapply()` 以及特殊符号：
+- `.SD`: 每个分组的数据子集，除了 `by` 或 `keyby` 的列
+- `.SDcols`: [与 ](https://link.zhihu.com/?target=http%3A//xn--jhq.sd/)`.SD` 连用，[用来选择包含在 ](https://link.zhihu.com/?target=http%3A//xn--uirq0as3e2ur8nf62xi66b.sd/)`.SD` 中的列，支持索引、列名、连选、反选、正则表达式、条件判断函数
+  
+  ```R
+  # 使用不带NA 的考试成绩数据
+  DT = readxl::read_xlsx("datas/ExamDatas.xlsx") %>%
+  as.data.table()
+  # 应用函数到所有列
+  DT[, lapply(.SD, as.character)]
+  # 应用函数到满足条件的列
+  DT[, lapply(.SD, rescale),                       # rescale() 为自定义的归一化函数
+  .SDcols = is.numeric]
+  # 应用函数到指定列
+  DT = as.data.table(iris)
+  DT[, .SD * 10, .SDcols = patterns("(Length)|(Width)")]
+  ```
+  
+  ![img](https://pic2.zhimg.com/v2-6ed97feb979f4d0415c860787972bfd1_b.png)
+  
+  删除列
+  
+  ```R
+  dt[, v1 := NULL]
+  dt[, c("v2","v3") := NULL]
+  cols = c("v2","v3")
+  dt[, (cols) := NULL]                      # 注意, 不是 dt[, cols := NULL]
+  ```
+  
+  重新编码
+  
+  ```R
+  # 一分支
+  dt[v1 < 4, v1 := 0]
+  # 二分支
+  dt[, v1 := fifelse(v1 < 0, -v1, v1)]
+  # 多分支
+  dt[, v2 := fcase(v2 < 4, "low",
+  v2 < 7, "middle",
+  default = "high")]
+  ```
+  
+  前移/后移运算
+  
+  ```R
+  shift(x, n = 1, fill = NA, type = "lag")        # 1,2,3 -> NA,1,2
+  shift(x, n = 1, fill = NA, type = "lead")       # 1,2,3 -> 2,3,NA
+  ```
+#### 3.5 分组汇总
+
+用 `by` 表达式指定分组。
+
+data.table 是根据 `by` 或 `keyby` 分组，区别是，`keyby` 会排序结果并创建键，使得更快地访问子集。
+
+未分组数据框相当于整个数据框作为 1 组，数据操作是在整个数据框上进行，汇总是得到 1 个结果。
+
+分组数据框，相当于整个数据框分成了 m 个数据框，数据操作是分别在每个数据框上进行，汇总是得到 m 个结果。
+
+```R
+# 使用带NA 值的考试成绩数据
+DT = readxl::read_xlsx("datas/ExamDatas_NAs.xlsx") %>%
+as.data.table()
+```
+
+未分组汇总
+
+```R
+DT[, .(math_avg = mean(math, na.rm = TRUE))]
+```
+
+![img](https://pic4.zhimg.com/v2-c7cdf7ea8e89e75eb40b2300849df013_b.png)
+
+简单的分组汇总
+
+```R
+DT[, .(n = .N,
+     math_avg = mean(math, na.rm = TRUE),
+     math_med = median(math)),
+     by = sex]
+```
+
+![img](https://pic2.zhimg.com/v2-880dbdb50648c95e09af64879ad0b861_b.jpg)
+
+可以直接在 `by` 中使用判断条件或表达式，特别是根据整合单位的日期时间汇总：
+
+```R
+date = as.IDate("2021-01-01") + 1:50
+DT = data.table(date, a = 1:50)
+DT[, mean(a), by = list(mon = month(date))]        # 按月平均
+```
+
+data.table 提供快速处理日期时间的 `IDateTime` 类，更多信息可查阅帮助。
+
+对某些列做汇总
+
+```R
+DT[, lapply(.SD, mean), .SDcols = patterns("h"),
+ by = .(class, sex)]                             # 或用 by = c("class", "sex")
+```
+
+对所有列做汇总
+
+```R
+DT[, name := NULL][, 
+ lapply(.SD, mean, na.rm = TRUE), by = .(class, sex)]
+```
+
+对满足条件的列做汇总
+
+```R
+DT[, lapply(.SD, mean, na.rm = TRUE), by = class, .SDcols = is.numeric]
+```
+
+分组计数
+
+```R
+DT = na.omit(DT)
+DT[, .N, by = .(class, cut(math, c(0, 60, 100)))] %>%
+print(topn = 2)
+```
+
+![img](https://pic2.zhimg.com/v2-9af2862e6398bff227fd0ae294554e89_b.jpg)
+
+上述分组计数会忽略频数为 0 的分组，若要显示出来可以用：
+
+```R
+DT[, Bin := cut(math, c(0, 60, 100))]
+DT[CJ(class = class, Bin = Bin, unique = TRUE), on = c("class","Bin"), .N, by = .EACHI]
+```
+
+其中，函数 `CJ()` 相当于 `expand_grid()`, 生成所有两两组合（笛卡尔积）。
+
+分组选择行
+
+data.table 也提供了辅助函数：`first(), last(), uniqueN()`. 比如提取每组的 first/nth 观测：
+
+```R
+DT[, first(.SD), by = class]
+DT[, .SD[3], by = class]                        # 每组第3 个观测
+DT[, tail(.SD, 2), by = class]                  # 每组后2 个观测
+# 选择每个班男生数学最高分的观测
+DT[sex == " 男", .SD[math == max(math)], by = class]
+```
+
+![img](https://pic1.zhimg.com/v2-788a3ddb8a1474ab2b36f574d1eb2950_b.jpg)
+## 4. 使用多个条件筛选dataframe
+
+```R
+library(dplyr)
+sub_orders = orders%>%filter(is.na(ordr_detl_id)==FALSE, pm_num<0) #筛选ordr_detl_id非NA，且pm_num小于0的所有行
+```
+## 5. 筛选某列有重复值的所有行
+
+````R
+dup_or = dup_or[duplicated(dup_or$ordr_detl_id),] #筛选出ordr_detl_id列所有重复值所在的行
+````
+## 6.  R markdown美化
+
+参考博客：[R markdown](https://divinerhjf.github.io/2018/07/09/r-markdown-shu-ju-bao-gao-sheng-cheng-li-qi/)、[Yi hui R markdown cookbook](https://bookdown.org/yihui/rmarkdown/)、[HTML工具](https://www.htmlwidgets.org/showcase_dygraphs.html)
+
+```R
+knitr::kable(ZZ,format = 'markdown')
+```
+
+或使用DT包中的datatable()函数，能实现非常丰富的表格展示，包括筛选、搜索、对列排序、设置滚动条等等，详情见[DT](https://rstudio.github.io/DT/)
+
+```R
+library(DT)
+datatable(ZZ, filter = 'top', options = list(pageLength = 20), caption = 'Table 1: The summary of B2C orders.')
+```
+
+设置输出html文件的格式，增加宽度，修改字体，修改字体大小，只需在Rmd文件前加入富文本即可：
+
+```Rmd
+---
+title: "B2C order exploration"
+author: "Mengcheng Guan"
+date: "2021/3/2"
+output: 
+html_document:
+  toc: true
+  number_section: true
+  df_print: paged
+  theme: default
+  highlight: tango
+---
+
+<style type="text/css">
+
+body, td {
+ font-family: Consolas;
+ font-size: 14px;
+}
+code.r{
+font-family:  Consolas;
+font-size: 16px;
+}
+pre {
+font-size: 12px
+}
+.main-container {
+max-width: 1600px; %页面宽度
+margin-left: auto;
+margin-right: auto;
+}
+</style>
+
+​```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(data.table)
+library(bit64)
+​```
+```
+## 7. 取第一个非空值的值（与oracle nvl函数相同）
+
+使用包statnet.common
+
+```R
+library(statnet.common)
+# NOT RUN {
+a <- NULL
+
+print(a) # NULL
+print(NVL(a,0)) # 0
+
+b <- 1
+
+print(b) # 1
+print(NVL(b,0)) # 1
+
+# Also,
+print(NVL(NULL,1,0)) # 1
+print(NVL(NULL,0,1)) # 0
+print(NVL(NULL,NULL,0)) # 0
+print(NVL(NULL,NULL,NULL)) # NULL
+
+NVL(a) <- 2
+a # 2
+NVL(b) <- 2
+b # still 1
+# }
+```
+## 8. 代码学习
+
+```R
+gb_orders[, is_initiator := as.numeric(userid==initiator)] #增加新列is_initiator，如果user_id与initialtor相同，则取1，否则取0
+
+> child[, table(orders>=offered_num)]
+
+FALSE  TRUE 
+27809  7143
+
+set.seed(9999)
+control_userids = sample(non_groupbuy_userids, 50000) # 随机取样
+
+cols = colnames(user_stats) #获取列名
+
+sub_users[is.na(rcvg_prov_name), rcvg_prov_name := 'unknown'] # rcvg_prov_name为空的直接赋值为'unknown'
+
+user_stats[, lapply(.SD, mean, na.rm=T), by=group, .SDcols = setdiff(colnames(user_stats), c('user_id', 'group', 'user_type', 'family_type', 'gender', 'reg_province'))]
+```
+## 9. 筛选出所有重复的行
+
+```R
+#由于duplicated函数判遇到第一个值生成False，遇到第二个同样的值则为重复值，去True，因此使用duplicated的时候，并不能把所有重复的行都找出来，用以下方法可以选出所有重复的行
+
+vec <- c("a", "b", "c","c","c") 
+vec[duplicated(vec) | duplicated(vec, fromLast=TRUE)]
+## [1] "c" "c" "c"
+
+df <- data.frame(rbind(c("a","a"),c("b","b"),c("c","c"),c("c","c")))
+df[duplicated(df) | duplicated(df, fromLast=TRUE), ]
+##   X1 X2
+## 3  c  c
+## 4  c  c
+```
+## 10. 统计某一列NA值个数
+
+```R
+sum(is.na(df$col)) #不是用length(is.na(df$col))
+```
+## 11. melt and dcast长宽数据转换
+
+例如tc的column有`ordr_time, wrong_revenue,wrong_marketing,wrong_gp_amt  `，现在需要将这个宽表转换为长表，即只包含`ordr_time, variable`，其中variable就包含了wrong_revenue,wrong_marketing, wrong_gp_amt。
+
+```R
+tc=orders[,.(wrong_revenue=length(which(isEqual_R==0)),
+  wrong_marketing=length(which(isEqual_M==0)),
+           wrong_gp_amt=length(which(isEqual_G==0))),by=ordr_time]
+long_tc = melt(tc,id='ordr_time')
+```
+
+相反，`dcast`是将长表展开为宽表，trend的column有`ordr_time_cut, cat1_id,total_sales `，将每个`cat1_id`都展开为单独的一列。
+
+```R
+trend = orders[gmv > 0,
+             .(total_sales = log(sum(gmv))), 
+             by = .(ordr_time_cut = cut(ordr_time, breaks = "month"), cat1_id)]
+trend_d = dcast(trend,ordr_time_cut~cat1_id,value.var = "total_sales")
+```
+## 12. Plot in R
+
+[Dygraphs](https://rstudio.github.io/dygraphs/index.html)
+
+[dygraphs循环画图不出图解决方案](https://stackoverflow.com/questions/30509866/for-loop-over-dygraph-does-not-work-in-r)
+
+绘制的图形可以参考我用Rmd制作的报告，见文章Rmarkdown示例。
+
+时间序列的图在用很多包都可以绘制，ggplot2是最基本的，另外可以用Dygraphs, Plotly绘制交互式的图表。下面记录下画时序图时遇到的几个问题：
+### 12.1 ggplot2基本函数
+
+首先介绍ggplo2的一些基本参数：
+
+`ggplot(data = df, aes(x = col1, y = col2, group = col3, color = as.factor(col4)))`
+
+该函数传入绘图所用的dataframe，ggplot使用[melt](#11)之后的数据比较方便，也就是长数据。当需要绘制有多个series的图时，需要令参数`group`等于series所在列，`color`的设置可以给每个series上不同的颜色，当series所在列是字符格式时，需要用`as.factor()`。
+
+图形类别有`geom_line(),geom_point(),geom_bar()`等等。
+
+`labs`设置X, Y轴名称。
+
+`scale_x_date`如果X轴是时间，则用此函数可以定义显示的格式以及时间间隔。
+
+`theme`定义坐标轴刻度内容的角度，如垂直文字。
+
+`scale_color_manual`当存在多个series的时候，默认的颜色不好看，可以通过此函数设置颜色
+
+当需要转换成交互式的图时，能更好的展示和查看数据，使用`ggplotly(p)`即可
+
+调色板取色参考博客[使用ggplot2和RColorBrewer](https://www.cnblogs.com/shaocf/p/9600340.html)
+
+示例代码如下：
+
+```R
+trend = orders[gmv > 0, 
+             .(total_sales = log(sum(gmv))), 
+             by = .(ordr_time_cut = cut(ordr_time, breaks = "month"), cat1_name)]
+trend$ordr_time_cut = as.Date(trend$ordr_time_cut)
+library(RColorBrewer) #调色板
+getPalette = colorRampPalette(brewer.pal(5, "Set1")) #调色板取色
+p = ggplot(data = trend,aes(x=ordr_time_cut,y=total_sales,group=cat1_name,color=as.factor(cat1_name)))+
+geom_line()+
+geom_point()+
+labs(x = "Time", y = "Sales(log) by category 1")+ 
+scale_x_date(date_breaks="1 months",date_labels="%b /%m")+ 
+theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1))+
+scale_color_manual(name = "Cat1_name", values = getPalette(length(unique(trend$cat1_name))))
+ggplotly(p)
+```
+
+![image-20210311203209606](https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/image-20210311203209606.png)
+### 12.2 Dygraph
+
+由于在时间序列数据绘制中，需要插入特定日期的观察线，试了一下用ggplot的`geom_vline和geom_segement`，效果都不是很理想，最后用Dygraph比较容易实现，但是Dygraph也有很多不足，官网说明不够多，legend的设置比较麻烦，并且在当series很多时，鼠标放在其中一个series的时候所有legend都出来了，目前通过修改css实现了只显示鼠标指向的series的name。
+
+Dygraphs使用宽数据比较方便。
+
+```R
+trend = orders[gmv > 0, 
+             .(total_sales = log(sum(gmv))), 
+             by = .(ordr_time_cut = cut(ordr_time, breaks = "month"), cat1_id)]
+trend$ordr_time_cut = as.Date(trend$ordr_time_cut)
+trend_d = dcast(trend,ordr_time_cut~cat1_id,value.var = "total_sales")
+dygraph(trend_d, main = "Sales(log) by cat1_id")%>%
+dyRangeSelector(dateWindow = c("2018-12-01", "2020-08-01"))%>%
+dyOptions(colors = RColorBrewer::brewer.pal(6, "Set1"))%>%
+dyOptions(drawPoints = TRUE, pointSize = 2) %>%
+dyEvent("2020-1-23", "COVID-19", labelLoc = "bottom")%>%  #增加特定日期观察线
+dyLegend(show = "follow")%>%						   #legend跟随鼠标, 还可设置 always
+dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%  #高亮一个series
+dyCSS(textConnection("                               #实现鼠标指向时只显示一个series的name
+   .dygraph-legend > span { display: none; }
+   .dygraph-legend > span.highlight { display: inline; }
+"))
+```
+
+![image-20210311210536219](https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/image-20210311210536219.png)
+### 12.3 循环执行ggplotly
+
+当series很多，n>50，则需要分开画
+
+```R
+trend = orders[gmv > 0, .(total_sales = log(sum(gmv))), by = .(ordr_time_cut = cut(ordr_time, breaks = "month"), cat2_name)]
+trend$ordr_time_cut = as.Date(trend$ordr_time_cut)
+getPalette = colorRampPalette(brewer.pal(5, "Set1"))
+split_list = split(unique(trend$cat2_name),1:10)
+plotlist = list()
+for(i in 1:length(split_list)){
+  p = ggplot(data = trend[cat2_name %in% split_list[[i]]],aes(x=ordr_time_cut,y=total_sales,group=cat2_name,color=as.factor(cat2_name)))+
+      geom_line()+
+      geom_point()+
+      labs(x = "Time", y = "Sales(log) by cat2_name")+ 
+      scale_x_date(date_breaks="1 months",date_labels="%b /%m")+ 
+      theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1))+
+      scale_color_manual(name = "cat2_name", values = getPalette(length(split_list[[i]])))
+  plotlist[[i]] = print(ggplotly(p))
+}
+htmltools::tagList(setNames(plotlist, NULL))
+```
+### 12.4循环执行Dygraph
+
+当series很多，n>50，则需要分开画
+
+```R
+trend = orders[gmv > 0, .(total_sales = log(sum(gmv))), by = .(ordr_time_cut = cut(ordr_time, breaks = "month"), cat2_id)]
+trend$ordr_time_cut = as.Date(trend$ordr_time_cut)
+trend_d = dcast(trend,ordr_time_cut~cat2_id,value.var = "total_sales")
+total_num = length(unique(trend$cat2_id))
+split_list = split(x=2:total_num,f=1:11)
+myfun = function(cut_list){
+tmp = c(1,split_list[[cut_list]])
+dygraph(trend_d[,..tmp], main = "Sales(log) by cat2_id",group = "My group")%>%
+    dyRangeSelector(dateWindow = c("2018-12-01", "2020-08-01"))%>%
+    dyOptions(colors = RColorBrewer::brewer.pal(6, "Set1"))%>%
+    dyOptions(drawPoints = TRUE, pointSize = 2) %>%
+    dyEvent("2020-1-23", "COVID-19", labelLoc = "bottom")%>%
+    dyLegend(show = "follow")%>%
+    dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
+    dyCSS(textConnection("
+       .dygraph-legend > span { display: none; }
+       .dygraph-legend > span.highlight { display: inline; }
+    "))
+}
+res = lapply(1:length(split_list), function(i) myfun(i))
+htmltools::tagList(res)
+```
+## 13 降序
+
+```
+t3 = t3[order(N,decreasing=T)]
+```
+## 14剔除NA数据
+
+```R
+na.rm=T 表示剔除NA数据
+```
+## 15 分组绘制直方图
+
+```R
+ggplot(sub_users,aes(year,fill=group))+ geom_histogram()+ facet_wrap(~group)
+```
+
+![image-20210406225410966](https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/image-20210406225410966.png)
+## 16 fillna
+
+```R
+# impute missing values for behavioral data
+cols = setdiff(cols, c('user_id', 'price'))
+for(col in cols) user_stats[is.na(get(col)), eval(col) := 0]
+```
+## 17 字符转换为时间
+
+```R
+gb_orders_clean$ordr_canl_time = as.POSIXct(gb_orders_clean$ordr_canl_time, format="%Y-%m-%d %H:%M:%S", tz='UTC')#一定要加时区 
+```
+
+在进行时间转换的时候，使用POSIXct时间必须要加时区！否则默认为CST时区。
+## 18 计算滚动差值
+
+```R
+library(plyr)
+df1 <- aggregate(ab~year+lg+team, FUN=sum, data=baseball)
+library(data.table)
+DT <- data.table(df1)
+DT
+#       year lg team   ab
+#    1: 1884 UA  ALT  108
+#    2: 1997 AL  ANA 1703
+#    3: 1998 AL  ANA 1502
+#    4: 1999 AL  ANA  660
+#    5: 2000 AL  ANA   85
+#   ---                  
+# 2523: 1895 NL  WSN  839
+# 2524: 1896 NL  WSN  982
+# 2525: 1897 NL  WSN 1426
+# 2526: 1898 NL  WSN 1736
+# 2527: 1899 NL  WSN  787
+Now, look at this concise solution:
+
+DT[, yoy := c(NA, diff(ab)), by = "team,lg"]
+DT
+#       year lg team   ab  yoy
+#    1: 1884 UA  ALT  108   NA
+#    2: 1997 AL  ANA 1703   NA
+#    3: 1998 AL  ANA 1502 -201
+#    4: 1999 AL  ANA  660 -842
+#    5: 2000 AL  ANA   85 -575
+#   ---                       
+# 2523: 1895 NL  WSN  839  290
+# 2524: 1896 NL  WSN  982  143
+# 2525: 1897 NL  WSN 1426  444
+# 2526: 1898 NL  WSN 1736  310
+# 2527: 1899 NL  WSN  787 -949
+```
+## 19 按分组计算每个固定时间间隔内的统计量
+
+[参考解答](https://stackoverflow.com/questions/39917890/r-how-to-resample-intraday-data-at-the-group-level)
+
+现有如下的数据，需要统计每个user_id，在send_date之前7天至send_date之间有多少条记录，如统计user6404566在其send_date7天内即（2019-8-31,2019-09-07]之间有多少条记录，每行如此。
+
+<img src="https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/image-20210602163910950.png" alt="image-20210602163910950" style="zoom:50%;" />
+
+```R
+dat1[,send_date.7D:=send_date-7]
+dat1[,newval:= dat1[dat1,on=.(user_id,send_date>send_date.7D,send_date<=send_date),.(N=.N),by=.EACHI]$N]
+```
+
+![image-20210602164319703](https://gmc-1258067706.cos.ap-chengdu.myqcloud.com/image-20210602164319703.png)
+## 20 统计唯一值个数
+
+[参考链接](https://stackoverflow.com/questions/33575740/number-of-unique-elements-excluding-na-in-r)
+
+使用data.table中的nuniqueN函数，有na.rm选项
+## 21 R felm
+
+```R
+felm(IHS(gross_profit)~is_aidrugs*month|pm_id+month|0|pm_id, data=product_panel)
+```
+
+按照`|`看：
+
+第一部分： is_aidrugs\*month 是协变量
+
+第二部分： pm_id + month 为两个固定效应
+
+第三部分： 0 为工具变量
+
+第四部分：pm_id 为计算分组稳健标准误的因子
+
+
+Interactions between a covariate `x` and a factor `f` can be projected out with the syntax `x:f`.
+## 22 PTT warning
+
+Warning in chol.default(mat, pivot = TRUE, tol = tol) :
+the matrix is either rank-deficient or indefinite
+共线性，不影响结果
+## 23 data.table 密度曲线
+```R
+user_panel[,densityplot(avg_gmv)]
+```
+![[Pasted image 20220329155150.png|500]]
+## 24 转义
+```R
+readRDS(r"(path)",)
+```
+要用双引号再加r
+## 25 查看data,table每列类型
+```R
+sapply(orders, typeof)
+```
+## 26 查找list中特定元素的位置
+```R
+> a <- 1:10 
+[1] 1 2 3 4 5 6 7 8 9 10 
+> which(a == 5) 
+[1] 5
+```
+## 27 merge()函数中all的用法
+![[Pasted image 20220803205610.png]]
+## 28 which.max出现次数最多的值
+```R
+orders[,mostFreq_cat = names(which.max(table(cat2_id)))]
+```

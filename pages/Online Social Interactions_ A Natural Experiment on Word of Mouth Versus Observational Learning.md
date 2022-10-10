@@ -1,0 +1,7 @@
+- title:: Online Social Interactions: A Natural Experiment on Word of Mouth Versus Observational Learning
+- #文献
+- [[Attachments]]
+	- ![Chen et al_2011_Online Social Interactions.pdf](../assets/Chen_et_al_2011_Online_Social_Interactions_1651467403041_0.pdf)
+-
+-
+-

@@ -1,0 +1,121 @@
+- 相关文献：
+	- ![Wang et al_2021_The power of social learning.pdf](../assets/Wang_et_al_2021_The_power_of_social_learning_1651410428863_0.pdf)
+	- ![Joshi_Musalem_2021_When Consumers Learn, Money Burns.pdf](../assets/Joshi_Musalem_2021_When_Consumers_Learn,_Money_Burns_1651411907278_0.pdf)
+	- ![Wang_Yu_2017_Social interaction-based consumer decision-making model in social commerce.pdf](../assets/Wang_Yu_2017_Social_interaction-based_consumer_decision-making_model_in_social_commerce_1651469320215_0.pdf)
+	- ![Chen et al_2011_Online Social Interactions.pdf](../assets/Chen_et_al_2011_Online_Social_Interactions_1651467403041_0.pdf)
+	- ![Qiu 等。 - 2018 - Learning from your friends’ check-ins An empirica.pdf](../assets/Qiu_等。_-_2018_-_Learning_from_your_friends’_check-ins_An_empirica_1652066452751_0.pdf)
+	-
+-
+- {{renderer :tocgen}}
+-
+- # What is observational learning?
+	- Definition of OL:
+	- ((626e8627-661a-4cc3-8c35-c36ea581e336))
+	- ((626f689a-4f39-472b-8022-c29ed22e41d9))
+	- ((626e921e-e3bb-4084-b176-715af893d4d9))
+		- [[#red]]==OL is a information-sharing mechanism==
+	- ((626f6c18-77ae-40ba-94f9-c6d129d6c2b9))
+		- [[#red]]==OL is a social interactions form==
+	- ((626f840f-bb5e-464e-b0ce-940623c52f6d))
+	- ((626f845b-3fd2-4ea8-94c2-a1a1e63b9193))
+	- ((626fe17a-d88d-43f2-9b75-3137c109e10b))
+	- ((626fe3da-cd82-4638-a39b-4b3e15abda00))
+	- ((62788a84-d552-4c03-b038-7dc0d90eab34))
+	-
+-
+- ---
+-
+- # What OL can do? (Consequences)
+	- ((626f68bc-8bdb-4d89-a3dc-c967882d62df))
+		- [[#red]]==consumer decisions==
+	- ((626f68cb-3bd1-433f-93ef-fdca180f2004))
+	- observational learning (OL) is a traditional Social learning method which is adopted by consumers to assist consumption decisions.
+	- ((626f68e6-48be-4a69-9c08-aada30e9d4c6))
+		- avoid unnecessary mistakes
+	- ((626e8c92-4d7f-45b1-b024-089fbae50ff4))
+	- ((626e93bb-686f-4e4f-9182-2e1e72420a5c))
+		- consumers learn about **quality** through OL
+	- ((626f7d6d-35e7-4c07-99ff-f0ec86751528))
+	- ((626f84c0-fab0-485e-b675-0e71d8382e7b))
+	- ((626f8501-dd8a-4ea1-9a4b-6138ee2d224f))
+	- ((626f8608-3081-40c1-bb15-e3df4eaa799c))
+	- ((626fdd32-f2d9-465c-b346-e7d00dccf91a))
+	- ((6278baef-cdf8-48b9-88d6-dff762a69223))
+		- impact on new product adoption/single purchase
+	-
+- # Why OL can affect individual's behavior? ([[#red]]==Mechanism==)
+	- ((62788b25-385a-4767-9b78-f7d7244f6b31))
+	- ((62788b5f-8015-418b-bbdf-20d1d1f4e156))
+	- ((6278bff3-105d-405c-833a-334d11ac8fbd))
+	-
+- ---
+- # Which factors affect OL? (Antecedents)
+	- [[#red]]==disclosure historical sales== can facilitate consumers' OL
+	  id:: 626e8473-87f1-461f-bbf4-802984d50116
+	- ((626f69ec-0bfb-40eb-af96-d2b1b7f0f947))
+	- ((626e903f-b095-4fac-975d-4afb1bd51719))
+	- ((626e9550-048c-4c50-b966-d74731c51d1f))
+		- actions of other consumers
+	- ((62788ef0-0181-4337-b6a5-71019f69295e))
+		- [[#red]]==social ties==: the strength of the social ties
+		- [[#red]]==geographic locations==
+	- ((6278c1fb-8c83-4eea-97f1-29e9aad3856f))
+		- consumer characteristics(e.g., Internet experience, users’ network size)
+		- product characteristics(e.g., video game popularity)
+	-
+- # **Prior studies:**
+  background-color:: #793e3e
+	- ((626f6935-4bcd-4bd2-a841-77a89e37d23a))
+	- ((626f696f-73e5-4a3a-99fd-f40312361433))
+		- has effects on : **payment intentions/ consumption decisions/ final purchase decisions**
+	- affect online consumer decision process.
+	- ((626f69ce-7989-4b3c-865d-a82b7d1ab743))
+	- ((626f877f-8815-443b-b641-4a7e8528afb7))
+	- ((626e90b5-da81-4981-9924-cc8b447343d0))
+	- ((626e9454-d7fe-4ca9-a94d-6ab74f237d1e))
+	- ((626f82b4-84c8-4383-b173-e52be7f431b5))
+	- ((626f8380-1923-413a-8ddb-6cdadbbc9014))
+	- ((626fddb7-8fc8-4689-8baf-e024d2c8e6d7))
+	- ((626fe379-0ff6-4c9b-857e-76f7dc88a952))
+	- ((62788ca8-b5be-4273-9de0-df60a7e82e8a))
+		- social ties
+	-
+	-
+- # Others
+- ((626f7dd2-9aa0-462a-8365-aecd7b02d4c0))
+	- digitize consumer purchase decision process
+- ((626f7fd4-9c13-4d7f-8885-daf2db6a04a2))
+	- social interaction is important
+- ((626f8016-1cec-4a47-8672-97fdf9b70b25))
+	- consumer are eager and easier to obtain information
+- ((626fdd54-b13a-4e93-950d-04eedd6d48f0))
+- ((626fe0ea-372c-41e7-ac22-e812fb1e1f7f))
+- ((626fe0fe-8552-4954-a426-0de1d716a170))
+- ((626fe1b2-d532-4c5e-9351-8e4335fbb84b))
+- ((626fe343-996a-42b2-8c7f-ce480cd5cd54))
+- ((626fe430-9ff3-4c60-a0ce-6dd1cb83cd59))
+-
+- # Gap
+- ((626f8687-f9fa-4579-9fc6-c3644c3eae03))
+	- We can receive information not only from previous consumers' purchases but also from current process in group buying.
+	  id:: 62733b0c-a70c-49d5-8273-39286d49ab10
+-
+-
+- FRAMEWORK
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-

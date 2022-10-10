@@ -1,0 +1,3 @@
+- Yi Liu ESC Rennes School of Business
+- https://www.rennes-sb.com/faculty/dr-liu-yi/
+-

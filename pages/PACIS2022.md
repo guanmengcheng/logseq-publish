@@ -1,0 +1,35 @@
+- 投稿时间： [[2022年03月15日]]
+- 主页：[主页](https://pacis2022.aisconferences.org/about/)
+- 投稿系统：[PACIS2022](https://new.precisionconference.com/user/login?next=https%3A//new.precisionconference.com/submissions)
+- 当前状态：[[Accept]]
+- 论文集下载：[下载链接]([PACIS 2022 Proceedings | Pacific Asia Conference on Information Systems (PACIS) | Association for Information Systems (aisnet.org)](https://aisel.aisnet.org/pacis2022/))
+- Pre: The Doctoral Consortium and the Junior Faculty Consortium will be held on July 5 [[2022-07-05]]
+- 审稿意见：
+	- ![Associate Editor review-regret paper.pdf](../assets/Associate_Editor_review-regret_paper_1651494698302_0.pdf)
+	- # Reviewer 1
+		- ((626fcf86-3f10-4aba-9c67-2259413b7bc5))
+		- Major concerns:
+			- ((626fd06a-43b7-428e-9795-a60878a16b2b))
+			- ((626fd0c8-7438-4981-a695-a124fd7e9c66))
+	- # Reviewer 2
+		- ((626fd249-48cf-4732-b365-06efb65250c4))
+		- ((626fd27e-090d-4bd8-bb74-4af5353863f2))
+		- ((626fd2bb-06c2-4958-9589-2ad2188b5b46))
+		- ((626fd2f0-bf75-47f4-8e2c-0473d9a448c5))
+	- # Reviewer 3
+		- ((626fd325-8ca3-4b7d-ad6f-09d3c8fe2adc))
+		- ((626fd36c-2c91-430c-bac6-70c402eca4d8))
+		- ((626fd3ab-b1ab-4b85-8293-20158d83d48d))
+		- ((626fd3d2-7517-49e7-9327-968ab0c4f906))
+		- ((626fd40f-5843-4108-b182-6be6851a7fcd))
+		- ((626fd483-6ad4-443c-b209-ea9ec1cf9f23))
+		- ((626fd92a-a1b0-4159-b2af-c401b3c860b3))
+	- # Reviewer 4(AE)
+		- ((626fd96b-1808-4c35-a993-82766b7ec9cc))
+		- ((626fd99d-9983-4194-b536-4e9cd988f255))
+		- ((626fd9da-cdae-4ed2-95af-7027b34639b2))
+		-
+-
+-
+-
+-

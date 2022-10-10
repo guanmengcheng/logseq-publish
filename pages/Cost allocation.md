@@ -1,0 +1,22 @@
+- [[Info]]
+	- 题目：Cost allocation in joint transportation
+	- 作者/合作人：[[管梦城]]， [[李建斌]]， [[刘志新]]， [[杨帆]]
+	- 启动时间： [[2021-09-01]]
+	- 发表时间：
+	- 目标期刊：
+	- [[投稿记录]] ： [[TRE]], [[COR]], [[CIE]]
+	- 审稿意见：
+		- [[TRE-review]]
+		- COR, desk reject
+		- CIE, under review
+-
+- [[Cost allocation推进情况]]
+- [[#red]]==创新点：==
+	- 提出了两种算法，一种是两阶段优化，另一种是联合优化。联合优化的效果要稍好于两阶段优化，但代价是求解速度的降低
+	- 提出了新的cost allocation方法
+-
+-
+-
+-
+-
+-
